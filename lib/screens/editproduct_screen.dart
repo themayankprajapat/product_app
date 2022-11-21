@@ -5,21 +5,33 @@ import 'package:product_app/models/productmodel.dart';
 import 'package:product_app/operations/product_operations.dart';
 import 'package:product_app/widgets/common_textfield.dart';
 
-class AddProductScreen extends StatefulWidget {
-  final ProductCardModel? productCardModel;
+class EditProduct extends StatefulWidget {
+  final ProductCardModel productCardModel;
 
-  const AddProductScreen({super.key, this.productCardModel});
+  const EditProduct({super.key, required this.productCardModel});
 
   @override
-  State<AddProductScreen> createState() => _AddProductScreenState();
+  State<EditProduct> createState() => _EditProductState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
+class _EditProductState extends State<EditProduct> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _productNameController = TextEditingController();
   final _productPriceController = TextEditingController();
   final _productImageController = TextEditingController();
-  double ratingValue = 1;
+  double? ratingValue;
+
+  @override
+  void initState() {
+    super.initState();
+    final productCardModel = widget.productCardModel;
+    _productNameController.text = productCardModel.productName;
+    _productPriceController.text =
+        productCardModel.productPrice.round().toString();
+    _productImageController.text = productCardModel.productImage;
+    ratingValue = productCardModel.rating;
+  }
+
   @override
   void dispose() {
     _productNameController.dispose();
@@ -50,7 +62,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Add New Product',
+                      'Edit Product details',
                       style: Theme.of(context).textTheme.headline5,
                     ),
                     const SizedBox(height: 20),
@@ -63,9 +75,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     CommonTextField(
                       controller: _productPriceController,
                       labelText: 'Enter Product price',
-                      keyboardType: TextInputType.number,
                       textInputFormatter:
                           FilteringTextInputFormatter.digitsOnly,
+                      keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 10),
                     CommonTextField(
@@ -76,7 +88,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     const SizedBox(height: 10),
                     RatingBar.builder(
                       itemSize: 20,
-                      initialRating: ratingValue,
+                      initialRating: ratingValue!,
                       minRating: 1,
                       direction: Axis.horizontal,
                       allowHalfRating: true,
@@ -96,15 +108,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          ProductOps().addProduct(
-                              _productNameController.text.trim(),
-                              double.parse(_productPriceController.text.trim()),
-                              ratingValue,
-                              _productImageController.text.trim());
+                          ProductOps().editProduct(
+                              widget.productCardModel,
+                              _productNameController.text,
+                              double.parse(_productPriceController.text),
+                              ratingValue!,
+                              _productImageController.text);
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Added'),
+                              content: Text('Saved'),
                             ),
                           );
                         }
@@ -116,10 +129,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           minimumSize: const Size(169, 47),
                           side: const BorderSide(color: Colors.black),
                           elevation: 6),
-                      child: Text('Add',
+                      child: Text('Save',
                           style: Theme.of(context).textTheme.headline5),
                     ),
-                    
                   ],
                 )),
           ),

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CommonTextField extends StatelessWidget {
-  const CommonTextField({
-    Key? key,
-    required TextEditingController controller,
-    required this.validatorString,
-    required this.labelText,
-  })  : _controller = controller,
+  const CommonTextField(
+      {Key? key,
+      required TextEditingController controller,
+      required this.labelText,
+      required this.keyboardType,
+      this.textInputFormatter})
+      : _controller = controller,
         super(key: key);
-  final String validatorString;
+  final TextInputFormatter? textInputFormatter;
   final String labelText;
-
+  final TextInputType keyboardType;
   final TextEditingController _controller;
 
   @override
@@ -20,10 +22,14 @@ class CommonTextField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value!.isEmpty) {
-          return validatorString;
+          return 'This field can\'t be empty!';
         }
         return null;
       },
+      inputFormatters: [
+        textInputFormatter ?? FilteringTextInputFormatter.singleLineFormatter
+      ],
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         filled: true,
