@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ButtonDropDown extends StatefulWidget {
+class ButtonDropDown extends StatelessWidget {
   const ButtonDropDown({super.key, required this.myItems});
   final List myItems;
   @override
-  State<ButtonDropDown> createState() => _ButtonDropDownState();
-}
-
-class _ButtonDropDownState extends State<ButtonDropDown> {
-  @override
   Widget build(BuildContext context) {
-    var currentItem = widget.myItems.first;
+    var currentItem = myItems.first;
 
     return DropdownButtonHideUnderline(
       child: DropdownButton(
         value: currentItem,
-        items: widget.myItems.map((items) {
-          return DropdownMenuItem(value: items, child: items);
+        items: myItems.map((items) {
+          return DropdownMenuItem(
+            value: items,
+            child: items,
+          );
         }).toList(),
         onChanged: (value) {
-          setState(() {
-            currentItem = value;
-          });
+          currentItem = value;
         },
       ),
     );

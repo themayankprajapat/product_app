@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CommonTextField extends StatelessWidget {
-  const CommonTextField(
-      {Key? key,
-      required TextEditingController controller,
-      required this.labelText,
-      required this.keyboardType,
-      this.textInputFormatter})
-      : _controller = controller,
+  const CommonTextField({
+    Key? key,
+    required TextEditingController controller,
+    required this.labelText,
+    required this.keyboardType,
+    this.textInputFormatter,
+  })  : _controller = controller,
         super(key: key);
   final TextInputFormatter? textInputFormatter;
   final String labelText;

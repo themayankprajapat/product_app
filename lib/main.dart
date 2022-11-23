@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:product_app/models/productmodel.dart';
+import 'package:product_app/providers/cart_provider.dart';
 import 'package:product_app/screens/home_screen.dart';
+import 'package:provider/provider.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(ProductCardModelAdapter());
   await Hive.openBox<ProductCardModel>('productcardmodel');
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CartProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

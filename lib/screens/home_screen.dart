@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:product_app/boxes.dart';
 import 'package:product_app/models/productmodel.dart';
-import 'package:product_app/operations/product_operations.dart';
 import 'package:product_app/screens/addproduct_screen.dart';
-import 'package:product_app/screens/editproduct_screen.dart';
-import 'package:product_app/utils/time_ago.dart';
-import 'package:product_app/widgets/button_dropdown.dart';
-import 'package:product_app/widgets/common_textbuttonicon.dart';
+import 'package:product_app/screens/mycart_screen.dart';
+import 'package:product_app/widgets/my_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
+    Hive.close();
     super.dispose();
   }
 
@@ -28,17 +25,27 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product App'),
+        actions: [
+          IconButton(
+            color: Colors.amber,
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const MyCart();
+              }));
+            },
+            icon: const Icon(Icons.shopping_cart_checkout),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber,
         onPressed: () {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return const AddProductScreen();
-              });
+          dialogForm(context, const AddProductScreen());
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.black,
+        ),
       ),
       body: ValueListenableBuilder<Box<ProductCardModel>>(
         valueListenable: Boxes.getProducts().listenable(),
@@ -67,115 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: products.length,
         itemBuilder: (BuildContext context, int index) {
           final product = products[index];
-          return productList(context, product);
+          return MyCard(context: context, productCardModel: product);
         },
       );
     }
   }
 
-  Widget productList(BuildContext context, ProductCardModel productCardModel) {
-    final time = timeAgo(productCardModel.createdTime);
-    final price = 'Rs. ${productCardModel.productPrice}';
-    List myItems = [
-      CommonTextButtonIcon(
-        label: 'Edit',
-        icondata: Icons.edit,
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return EditProduct(
-                  productCardModel: productCardModel,
-                );
-              });
-        },
-        color: Colors.green,
-      ),
-      CommonTextButtonIcon(
-        label: 'Delete',
-        icondata: Icons.delete,
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Are you sure?'),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancel')),
-                    TextButton(
-                        onPressed: () {
-                          ProductOps().deleteProduct(productCardModel);
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Delete')),
-                  ],
-                );
-              });
-        },
-        color: Colors.red,
-      ),
-    ];
-    return SizedBox(
-      height: 299,
-      width: 169,
-      child: Card(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(
-            height: 165,
-            child: Image.network(
-              productCardModel.productImage,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
-                'assets/images/darkpage.jpg',
-                fit: BoxFit.cover,
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  productCardModel.productName,
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  price,
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-                const SizedBox(height: 10),
-                RatingBar.builder(
-                  ignoreGestures: true,
-                  itemSize: 20,
-                  initialRating: productCardModel.rating,
-                  minRating: 1,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemCount: 5,
-                  itemBuilder: (context, _) => const Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                  ),
-                  onRatingUpdate: (rating) {},
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  time,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                ButtonDropDown(myItems: myItems)
-              ],
-            ),
-          )
-        ]),
-      ),
-    );
+  Future<dynamic> dialogForm(BuildContext context, Widget child) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return child;
+        });
   }
 }

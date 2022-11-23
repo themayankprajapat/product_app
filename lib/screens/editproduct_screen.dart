@@ -101,7 +101,6 @@ class _EditProductState extends State<EditProduct> {
                         setState(() {
                           ratingValue = rating;
                         });
-                        {}
                       },
                     ),
                     const SizedBox(height: 10),

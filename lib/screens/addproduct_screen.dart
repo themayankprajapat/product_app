@@ -119,7 +119,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       child: Text('Add',
                           style: Theme.of(context).textTheme.headline5),
                     ),
-                    
                   ],
                 )),
           ),
